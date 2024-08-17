@@ -1,12 +1,14 @@
 package es.minsait.MovieSugestion.service;
 
 import es.minsait.MovieSugestion.prompts.PromptContext;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class ConversationContextServiceImpl implements ConversationContextService {
 
     Map<String, List<String>> contextoStore = new HashMap<>();

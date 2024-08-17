@@ -1,5 +1,6 @@
 package es.minsait.MovieSugestion.controller;
 
+import es.minsait.MovieSugestion.service.ConversationContextService;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
@@ -9,14 +10,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/movies")
 public class MovieAssistantController {
 
     private OpenAiChatModel openAiChatModel;
+    private ConversationContextService conversationContextService;
 
-    public MovieAssistantController(OpenAiChatModel openAiChatModel) {
+    public MovieAssistantController(OpenAiChatModel openAiChatModel,
+                                    ConversationContextService conversationContextService) {
         this.openAiChatModel = openAiChatModel;
+        this.conversationContextService = conversationContextService;
     }
 
     @GetMapping("/informacoes") // http://localhost:8080/movies/informacoes
@@ -51,6 +59,24 @@ public class MovieAssistantController {
                 .getResult()
                 .getOutput()
                 .getContent();
+    }
+
+    //end point de buscar os ids de contexto
+    @GetMapping("/context/ids") // http://localhost:8080/movies/context/ids
+    public List<String> getContextIds() {
+        return conversationContextService.fetchAllContextId();
+    }
+
+    // end point de informacao de contexto
+    @GetMapping("/context/informacoes") // http://localhost:8080/movies/context/informacoes
+    public Map<String, String> getContextInformacoes(
+            @RequestParam(value="contextId", defaultValue = "") String contextId,
+            @RequestParam(value="message", defaultValue = "Quais são os top 10 filmes mais assistidos?") String message
+    ){
+        if(contextId.isEmpty())
+            contextId = UUID.randomUUID().toString();
+        String prompt = conversationContextService.preparePrompt(contextId, message);
+        return Map.of("Generated", openAiChatModel.call(prompt));
     }
 
 }
