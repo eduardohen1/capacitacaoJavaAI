@@ -7,7 +7,7 @@ import java.util.Properties;
 public class Pipeline {
 
     private static Properties properties;
-    private static String propertiesName = "tokenize, ssplit, pos"; //os nomes dos métodos de pesquisa.
+    private static String propertiesName = "tokenize, ssplit, pos, lemma, ner, parse, sentiment"; //os nomes dos métodos de pesquisa.
     private static StanfordCoreNLP stanfordCoreNLP;
 
     private Pipeline() { }
